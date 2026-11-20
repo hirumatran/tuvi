@@ -66,6 +66,19 @@ button:hover { filter: brightness(1.1); }
 .zh { font-size: 11.5px; color: var(--muted); opacity: .85; }
 .sub { margin: 2px 0 6px; font-size: 13px; }
 .span-all { grid-column: 1 / -1; }
+.maintabs { display: flex; gap: 0; margin: 4px 0 14px; border-bottom: 2px solid var(--line); }
+.maintabs button { flex: 1 1 0; background: transparent; color: var(--muted); border: 0; border-bottom: 3px solid transparent;
+  border-radius: 0; padding: 10px 8px; font-size: 15px; font-weight: 700; margin-bottom: -2px; }
+.maintabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.maintabs button:hover { filter: none; color: var(--accent); }
+section[hidden] { display: none; }
+form.couple-form { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.che-list { margin-top: 10px; font-size: 12.5px; }
+.che-list ul { margin: 4px 0; }
+.couple-form fieldset { border-style: solid; background: var(--bg); }
+.couple-form legend { font-size: 14px; }
+.couple-opts { grid-column: 1 / -1; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; }
+.tabs-label { align-self: center; font-size: 13px; color: var(--muted); margin-right: 4px; }
 fieldset { border: 1px dashed var(--line); border-radius: 8px; padding: 10px; margin: 0; display: grid; gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; }
 fieldset[hidden] { display: none; }

@@ -27,6 +27,7 @@
   const TAM_HOP = ["申子辰", "寅午戌", "巳酉丑", "亥卯未"];
 
   function engine() { return root.TuViEngine || require("./engine.js"); }
+  function napLib() { return root.TuViNapAm || require("./napam.js"); }
 
   /* Đánh giá cung Tử Tức của một lá số: liệt kê điểm thuận / điểm cần lưu tâm (minh bạch, không chấm điểm ẩn). */
   function assess(d) {
@@ -65,6 +66,17 @@
     if (KHAC[child] === parent) return ["Con khắc", -1];
     return ["Khắc con", -1];
   }
+  /* Quan hệ nạp âm giữa can chi gzC (con) và gzP (cha/mẹ), có xét ngoại lệ chế hóa (js/napam.js). */
+  function relNap(gzC, gzP) {
+    const E = engine(), NA = napLib();
+    const [nc, ec] = E._internals.napAm(gzC[0], gzC[1]), [np, ep] = E._internals.napAm(gzP[0], gzP[1]);
+    const base = relElement(ec, ep);
+    if (base[1] >= 0) return [base[0], base[1], null];
+    // "Con khắc": con khắc cha/mẹ → bên bị khắc là cha/mẹ; "Khắc con": ngược lại
+    const rule = base[0] === "Con khắc" ? NA.find(np, gzP, nc, gzC) : NA.find(nc, gzC, np, gzP);
+    if (!rule) return [base[0], -1, null];
+    return [`${base[0]} · chế hóa${rule.eff ? " (tốt)" : " (không hại)"}`, rule.eff, rule];
+  }
   function relBranch(a, b) {
     const pair = [a + b, b + a];
     if (LUC_XUNG.some(x => pair.includes(x))) return ["Lục xung", -1];
@@ -86,7 +98,7 @@
       const ha = hitsOf(oa), hb = hitsOf(ob);
       const s = STEMS[(y - 4) % 10], br = BRANCHES[(y - 4) % 12];
       const [napName, napEl] = E._internals.napAm(s, br);
-      const ea = relElement(napEl, a.vn.ban_menh.element), eb = relElement(napEl, b.vn.ban_menh.element);
+      const ea = relNap(s + br, a.calendar.year_ganzhi), eb = relNap(s + br, b.calendar.year_ganzhi);
       const ba = relBranch(br, a.calendar.year_ganzhi[1]), bb = relBranch(br, b.calendar.year_ganzhi[1]);
       const good = [...ha.out, ...hb.out].some(x => x.t !== "化忌");
       const ky = [...ha.out, ...hb.out].some(x => x.t === "化忌" && x.lay === "LN");
@@ -116,13 +128,14 @@
     } else syn.push("Cả hai lá số đều ở mức thuận – nghịch đan xen: đường con cái bình thường, thời điểm thuận lợi phụ thuộc vào vận hạn (xem bảng bên dưới).");
     if (a.voids && b.voids) syn.push("Cả hai cùng có Tuần hoặc Triệt ở Tử Tức: dấu hiệu muộn con được nhấn mạnh.");
     if (a.ky && b.ky) syn.push("Cả hai cùng có Hóa Kỵ năm sinh ở Tử Tức: cả hai đều rất để tâm đến con cái, dễ lo lắng — nên thống nhất cách nuôi dạy.");
-    const ma = A.vn.ban_menh, mb = B.vn.ban_menh, rm = relElement(ma.element, mb.element)[0];
+    const ma = A.vn.ban_menh, mb = B.vn.ban_menh, rr = relNap(A.calendar.year_ganzhi, B.calendar.year_ganzhi), rm = rr[0].split(" · ")[0];
     const rmText = { "Bình hòa": "bình hòa (cùng hành)", "Con sinh": `${ma.element} sinh ${mb.element} (tương sinh)`, "Sinh con": `${mb.element} sinh ${ma.element} (tương sinh)`, "Con khắc": `${ma.element} khắc ${mb.element} (tương khắc)`, "Khắc con": `${mb.element} khắc ${ma.element} (tương khắc)` }[rm];
-    syn.push(`Bản mệnh: ${labelA} <b>${ma.name}</b>, ${labelB} <b>${mb.name}</b> — ${rmText} <span class="tagx">xem tuổi dân gian</span>.`);
+    const che = rr[2] ? ` — nhưng thuộc ngoại lệ chế hóa, ${rr[2].eff ? "được xem là tốt" : "không hại"} <span class="zh" title="${napLib().SRC}">「${rr[2].zh}」</span>` : "";
+    syn.push(`Bản mệnh: ${labelA} <b>${ma.name}</b>, ${labelB} <b>${mb.name}</b> — ${rmText}${che} <span class="tagx">xem tuổi dân gian</span>.`);
 
     const rows = yearRows(inA, inB, A, B, startYear, 10);
     const hitTxt = r => r.out.map(x => `<span class="hoa ${V.HOA[x.t][1]}" title="${x.lay === "ĐH" ? "Đại hạn" : "Lưu niên"}: ${V.STAR[x.s]}">${x.lay} ${V.HOA[x.t][0]}</span>`).join(" ") + (r.menh ? ' <span class="mini">Mệnh LN tại Tử Tức</span>' : "") || "—";
-    const rel = (e, br) => `<span class="${e[1] < 0 ? "no" : "ok"}">${e[0]}</span>${br[0] ? `, <span class="${br[1] < 0 ? "no" : "ok"}">${br[0]}</span>` : ""}`;
+    const rel = (e, br) => `<span class="${e[1] < 0 ? "no" : "ok"}"${e[2] ? ` title="${napLib().SRC}: ${e[2].zh}"` : ""}>${e[0]}${e[2] ? " ⓘ" : ""}</span>${br[0] ? `, <span class="${br[1] < 0 ? "no" : "ok"}">${br[0]}</span>` : ""}`;
     const table = `<div class="tbl-wrap"><table class="yt"><thead><tr>
         <th>Năm (âm lịch)</th><th>Tứ hóa vào Tử Tức · ${labelA}</th><th>Tứ hóa vào Tử Tức · ${labelB}</th>
         <th>Tuổi con – ${labelA}</th><th>Tuổi con – ${labelB}</th><th></th></tr></thead><tbody>
@@ -136,15 +149,23 @@
       <h4>Nhận định chung</h4><ul>${syn.map(x => `<li>${x}</li>`).join("")}</ul>
       <h4>Mười năm tới (${startYear}–${startYear + 9})</h4>
       ${table}
+      ${(() => {
+        const used = new Map();
+        for (const r of rows) for (const e of [r.ea, r.eb]) if (e[2]) used.set(e[2], e[2]);
+        if (rr[2]) used.set(rr[2], rr[2]);
+        if (!used.size) return "";
+        return `<div class="che-list"><b>Ngoại lệ chế hóa đã áp dụng</b> <span class="mini">(${napLib().SRC})</span><ul>${[...used.values()].map(x =>
+          `<li><b>${x.a}</b> gặp <b>${x.b}</b> khắc: ${x.eff ? "được xem là tốt" : "không hại"} — <span class="zh">「${x.zh}」</span></li>`).join("")}</ul></div>`;
+      })()}
       <ul class="legend2">
         <li><b>Tứ hóa vào Tử Tức</b> (Tử Vi): ĐH = Tứ hóa của đại hạn, LN = Tứ hóa của lưu niên rơi vào cung Tử Tức gốc. Lộc, Quyền, Khoa: thuận lợi về con cái; Kỵ: nên để tâm, tránh nóng vội.</li>
-        <li><b>Tuổi con – cha/mẹ</b> (<span class="tagx">xem tuổi dân gian</span>, không thuộc Tử Vi): so ngũ hành nạp âm của năm sinh con với bản mệnh cha/mẹ (Con sinh, Sinh con, Bình hòa là thuận; Con khắc, Khắc con là kém) và địa chi năm (Tam hợp, Lục hợp là thuận; Lục xung là kém). Chưa xét các ngoại lệ chế hóa của nạp âm.</li>
+        <li><b>Tuổi con – cha/mẹ</b> (<span class="tagx">xem tuổi dân gian</span>, không thuộc Tử Vi): so ngũ hành nạp âm của năm sinh con với bản mệnh cha/mẹ (Con sinh, Sinh con, Bình hòa là thuận; Con khắc, Khắc con là kém) và địa chi năm (Tam hợp, Lục hợp là thuận; Lục xung là kém). Có xét <b>ngoại lệ chế hóa</b> theo <i>Tam Mệnh Thông Hội</i> (quyển 1): một số cặp nạp âm tuy khắc nhưng được xem là tốt hoặc không hại — các ô có dấu ⓘ là đã áp dụng ngoại lệ, nguyên văn xem ở danh sách phía trên.</li>
         <li><b>★</b>: năm có Lộc, Quyền hoặc Khoa vào Tử Tức của ít nhất một người, không có Kỵ lưu niên vào Tử Tức của ai, và tuổi con không khắc, không xung với cả hai. Năm tính theo âm lịch (từ Tết đến Tết).</li>
       </ul>
       <p class="disclaimer">Đây là gợi ý theo quy tắc truyền thống, chỉ để tham khảo. Thời điểm sinh con nên dựa trên sức khỏe, điều kiện gia đình và tư vấn của bác sĩ.</p></div>`;
   }
 
-  const api = { assess, analyzeCouple, yearRows, relElement, relBranch };
+  const api = { assess, analyzeCouple, yearRows, relElement, relBranch, relNap };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.TuViCouple = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -39,5 +39,20 @@ eq(ts[start], "Tràng Sinh", "Tràng Sinh khởi đúng cục");
 const dirOk = (o.calendar.year_yinyang === "阳") === (o.normalized_input.gender === "男") ? 1 : -1;
 eq(ts[E.BRANCHES[(E.BRANCHES.indexOf(start) + dirOk + 12) % 12]], "Mộc Dục", "Chiều Tràng Sinh");
 eq(Object.keys(ts).length, 12, "Đủ 12 sao Tràng Sinh");
+// Ngoại lệ chế hóa nạp âm (js/napam.js)
+const NA = require("../js/napam.js"), C = require("../js/couple.js");
+const names = {}; for (let s = 0; s < 10; s++) for (let r = 0; r < 12; r++) if (s % 2 === r % 2) { const [n, el] = napAm(E.STEMS[s], E.BRANCHES[r]); names[n] = el; }
+const KHAC = { Kim: "Mộc", Mộc: "Thổ", Thổ: "Thủy", Thủy: "Hỏa", Hỏa: "Kim" };
+for (const r of NA.RULES) {
+  if (!(r.a in names) || !(r.b in names)) { fail++; console.log("SAI tên nạp âm:", r.a, r.b); continue; }
+  if (KHAC[names[r.b]] !== names[r.a]) { fail++; console.log("SAI: không phải cặp khắc", r.a, "←", r.b); }
+}
+eq(C.relNap("壬戌", "庚午")[0], "Khắc con · chế hóa (tốt)", "Đại Hải Thủy (con) – Lộ Bàng Thổ (cha mẹ)");
+eq(C.relNap("庚午", "壬戌")[0], "Con khắc · chế hóa (tốt)", "Lộ Bàng Thổ (con) – Đại Hải Thủy (cha mẹ)");
+eq(C.relNap("己丑", "壬申")[0], "Con khắc · chế hóa (tốt)", "Kiếm Phong 壬申 – Tích Lịch 己丑");
+eq(C.relNap("戊子", "壬申")[0], "Con khắc", "Kiếm Phong 壬申 – Tích Lịch 戊子 (không thuộc cặp)");
+eq(C.relNap("丙午", "庚午")[0], "Khắc con", "Thiên Hà – Lộ Bàng (cổ thư: 就位相克)");
+eq(C.relNap("丙午", "丙辰")[0], "Khắc con · chế hóa (tốt)", "Thiên Hà – Sa Trung Thổ");
+console.log(`Ngoại lệ chế hóa: ${NA.RULES.length} quy tắc đã kiểm tra.`);
 if (fail) { console.log(`THẤT BẠI: ${fail} lỗi`); process.exit(1); }
 console.log("Tất cả kiểm thử đạt.");
