@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lá Số Tử Vi</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>Lá Số Tử Vi Đẩu Số</h1>
+  <p>Tính toán ngay trên trình duyệt · An sao theo phái Tam Hợp, bổ sung Tuần, Triệt, vòng Tràng Sinh theo Tử Vi Việt Nam</p>
+</header>
+<main>
+  <form id="f">
+    <label>Lịch
+      <select id="cal"><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select>
+    </label>
+    <label>Ngày sinh (năm-tháng-ngày) <input id="date" type="date" value="1990-05-15" min="1901-01-01" max="2099-12-31" required></label>
+    <label>Giờ sinh <input id="time" type="time" value="14:30" required></label>
+    <label>Giới tính
+      <select id="gender"><option value="男">Nam</option><option value="女">Nữ</option></select>
+    </label>
+    <label>Năm xem vận (âm lịch) <input id="qy" type="number" min="1901" max="2100"></label>
+    <label class="chk"><input id="leap" type="checkbox"> Tháng nhuận (âm lịch)</label>
+    <label>Sinh sau 23:00
+      <select id="zi"><option value="next_day">Tính sang ngày hôm sau</option><option value="same_day">Giữ ngày hôm đó</option></select>
+    </label>
+    <button type="submit">Lập lá số</button>
+  </form>
+  <div id="out"></div>
+  <p class="note">Lõi an sao chuyển từ skill <a href="https://github.com/fanzr-arch/numerologist_skills">ziwei-doushu (numerologist_skills)</a>;
+    âm lịch dùng thư viện <a href="https://github.com/6tail/lunar-javascript">lunar-javascript</a>. Mọi tính toán chạy trên máy bạn, không gửi dữ liệu đi đâu.</p>
+</main>
+<script src="js/lunar.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/interpret.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

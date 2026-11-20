@@ -1,0 +1,6 @@
+{
+  "name": "tuvi",
+  "private": true,
+  "description": "Lá số Tử Vi chạy trực tiếp trên trình duyệt",
+  "scripts": { "test": "node tests/run.js" }
+}
