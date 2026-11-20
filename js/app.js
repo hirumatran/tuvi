@@ -7,9 +7,12 @@
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const hoaTag = h => (h ? `<span class="hoa ${HOA[h][1]}">${HOA[h][0]}</span>` : "");
-  let DATA = null;
+  let DATA = null, COUPLE = null, VIEW = 0;
 
   $("#qy").value = Lunar.fromDate(new Date()).getYear();
+  $("#couple").addEventListener("change", e => { $("#p2").hidden = !e.target.checked; });
+  $("#gender").addEventListener("change", e => { $("#gender2").value = e.target.value === "男" ? "女" : "男"; });
+  const roleLabel = (g, other) => g === other ? null : (g === "男" ? "Chồng" : "Vợ");
 
   $("#f").addEventListener("submit", e => {
     e.preventDefault();
@@ -21,11 +24,31 @@
       late_zi_rule: $("#zi").value,
     };
     if ($("#qy").value) payload.query_year = +$("#qy").value;
+    let who = "";
     try {
-      DATA = TuViEngine.buildOutput(payload);
+      who = "người thứ nhất";
+      const A = TuViEngine.buildOutput(payload);
+      COUPLE = null; VIEW = 0;
+      if ($("#couple").checked) {
+        who = "vợ/chồng";
+        const inB = {
+          calendar_type: $("#cal2").value,
+          birth_time: `${$("#date2").value} ${$("#time2").value}`,
+          gender: $("#gender2").value,
+          is_leap_month: $("#leap2").checked,
+          late_zi_rule: $("#zi").value,
+        };
+        if (payload.query_year) inB.query_year = payload.query_year;
+        const B = TuViEngine.buildOutput(inB);
+        const la = roleLabel(payload.gender, inB.gender) || "Người 1", lb = roleLabel(inB.gender, payload.gender) || "Người 2";
+        const strip = o => { const x = { ...o }; delete x.query_year; return x; };
+        COUPLE = { charts: [A, B], labels: [la, lb],
+          html: TuViCouple.analyzeCouple(A, B, strip(payload), strip(inB), la, lb, payload.query_year || Lunar.fromDate(new Date()).getYear()) };
+      }
+      DATA = A;
       render();
     } catch (err) {
-      $("#out").innerHTML = `<div class="err">Lỗi: ${esc(err.message)}</div>`;
+      $("#out").innerHTML = `<div class="err">Lỗi (${who}): ${esc(err.message)}</div>`;
     }
   });
 
@@ -67,10 +90,17 @@
       <div class="legend">M Miếu · V Vượng · Đ Đắc · L Lợi · B Bình · BĐ Bất đắc · H Hãm<br>ĐH đại hạn · LN lưu niên · Bấm một cung để xem chi tiết</div>
     </div>`;
     const warns = DATA.warnings.map(warnText).filter(Boolean);
-    $("#out").innerHTML = (warns.length ? `<div class="warn">⚠ ${warns.join("<br>⚠ ")}</div>` : "") +
+    const tabs = COUPLE ? `<div class="tabs">${COUPLE.labels.map((l, i) => `<button type="button" data-v="${i}" class="${i === VIEW ? "on" : ""}">Lá số ${l}</button>`).join("")}
+      <button type="button" data-v="couple">Con cái hai vợ chồng ↓</button></div>` : "";
+    $("#out").innerHTML = (warns.length ? `<div class="warn">⚠ ${warns.join("<br>⚠ ")}</div>` : "") + tabs +
       `<div class="board-wrap"><div class="board">${cells}${center}</div></div>
        <div id="detail"></div>
-       <div class="panel"><h3>Giải nghĩa lá số</h3>${interpret(DATA)}</div>`;
+       ${COUPLE ? COUPLE.html : ""}
+       <div class="panel"><h3>Giải nghĩa lá số${COUPLE ? " — " + COUPLE.labels[VIEW] : ""}</h3>${interpret(DATA)}</div>`;
+    document.querySelectorAll(".tabs button").forEach(bt => bt.addEventListener("click", () => {
+      if (bt.dataset.v === "couple") { document.getElementById("couple-panel").scrollIntoView({ behavior: "smooth" }); return; }
+      VIEW = +bt.dataset.v; DATA = COUPLE.charts[VIEW]; render();
+    }));
     document.querySelectorAll(".cell").forEach(el => el.addEventListener("click", () => select(el.dataset.br)));
     placeVoids();
     select(c.ming_gong.branch);

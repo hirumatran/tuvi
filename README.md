@@ -9,6 +9,7 @@
 - Bàn 12 cung bố cục truyền thống: 14 chính tinh kèm độ sáng, phụ tinh, lục sát, Tứ hóa, cung Thân, Cục, Mệnh chủ – Thân chủ, tuổi đại hạn.
 - Bổ sung theo Tử Vi Việt Nam: **Tuần**, **Triệt** (đặt trên ranh giới hai cung), **vòng Tràng Sinh**, nạp âm bản mệnh, sinh khắc Cục – Mệnh, Âm Dương thuận/nghịch lý.
 - Bấm vào cung để xem tam phương tứ chính.
+- **Con cái cho hai vợ chồng** (tích “Xem con cái cho hai vợ chồng” và nhập thêm thông tin vợ/chồng): lập riêng hai lá số, so sánh cung Tử Tức của mỗi người, đưa ra nhận định chung và bảng 10 năm tới gồm Tứ hóa đại hạn / lưu niên nhập Tử Tức (Tử Vi) và xem tuổi sinh con theo dân gian (nạp âm, địa chi hợp – xung, ghi rõ là không thuộc Tử Vi). Có nút chuyển xem lá số từng người.
 - Mục **Giải nghĩa lá số**: tổng quan, cung Mệnh, các cung trọng yếu, **con cái (cung Tử Tức)**, Tứ hóa năm sinh, đại hạn và lưu niên (song Lộc, song Kỵ, Lộc – Kỵ cùng hội).
 - Mục con cái dựa trên nguyên văn *Tử Vi Đẩu Số Toàn Thư*, quyển 2, mục「四子女」([Wikisource, oldid=1963110](https://zh.wikisource.org/w/index.php?title=紫微斗數全書/卷二&oldid=1963110)), hiển thị kèm chữ Hán và bản dịch; bổ sung quy ước Việt Nam (Tràng Sinh, Tuần, Triệt, Hồng Loan, Thiên Hỷ tại Tử Tức).
 
@@ -22,6 +23,7 @@
 | `js/engine.js` | Lõi an sao. Phần Tam Hợp chuyển 1:1 từ `ziwei-doushu/scripts/ziwei_cli.py` của [numerologist_skills](https://github.com/fanzr-arch/numerologist_skills); phần Việt Nam (Tuần, Triệt, Tràng Sinh, nạp âm) viết bổ sung |
 | `js/interpret.js` | Từ điển Hán – Việt và phần giải nghĩa (dịch, biên tập từ `references/stars.md`, `references/sihua.md` của skill) |
 | `js/children.js` | Luận cung Tử Tức (con cái) |
+| `js/couple.js` | Luận con cái cho hai vợ chồng |
 | `js/app.js`, `css/style.css`, `index.html` | Giao diện |
 | `js/lunar.js` | Thư viện âm lịch [lunar-javascript](https://github.com/6tail/lunar-javascript) 1.7.7 (MIT) |
 | `tests/` | Kiểm thử đối chiếu với script Python gốc |
