@@ -120,6 +120,7 @@
       <ul>${majors}
       <li>Vòng Tràng Sinh: <b>${vn.trang_sinh[br]}</b> — ${TRANG_SINH_TEXT[vn.trang_sinh[br]]}.</li>
       ${voids.length ? `<li>Gặp <b>${voids.join(", ")}</b>: sức các sao trong cung bị ngăn lại.</li>` : ""}
+      ${p.name === "子女" ? '<li>Xem luận giải chi tiết ở mục <a href="#con-cai">Con cái</a> trong phần Giải nghĩa.</li>' : ""}
       <li><b>Tam phương tứ chính:</b> ${tri.map(b => `${PAL[P[b].name]} (${P[b].major_stars.map(s => STAR[s.name]).join(", ") || "VCD"})`).join(" · ")}</li></ul></div>`;
   }
 })();

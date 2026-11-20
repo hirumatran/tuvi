@@ -156,11 +156,13 @@
       <li>${(() => { const p = P.find(x => x.name === "迁移"); return `<b>Thiên Di</b> (${stars(p) || "vô chính diệu"}): ${p.major_stars.map(s => STAR_TEXT[s.name].core).join("; ") || "chịu ảnh hưởng từ cung Mệnh xung chiếu"} — thể hiện cách ứng xử và cơ hội khi ra ngoài xã hội.`; })()}</li>
       <li>${(() => { const p = P.find(x => x.name === "福德"); return `<b>Phúc Đức</b> (${stars(p) || "vô chính diệu"}): đời sống tinh thần mang màu sắc ${p.major_stars.map(s => STAR_TEXT[s.name].plus.split(",")[0]).join(", ") || "của các sao xung chiếu"}; Phúc Đức gặp ${vn.trang_sinh[p.branch]}.`; })()}</li></ul>`);
 
-    // 4. Tứ hóa năm sinh
-    out.push(`<h4>4. Tứ hóa năm sinh (ảnh hưởng suốt đời)</h4><ul>${c.year_sihua.map(x =>
+    // 4. Con cái (js/children.js)
+    out.push(`${root.TuViChildren ? root.TuViChildren.analyze(d).replace("<h4>Con cái", "<h4 id=\"con-cai\">4. Con cái") : ""}`);
+    // 5. Tứ hóa năm sinh
+    out.push(`<h4>5. Tứ hóa năm sinh (ảnh hưởng suốt đời)</h4><ul>${c.year_sihua.map(x =>
       `<li><b>${STAR[x.star]} Hóa ${HOA[x.type][0]}</b> tại ${PAL[x.palace]}: ${HOA_TEXT[x.type][x.palace]}.</li>`).join("")}</ul>`);
 
-    // 5. Vận hạn
+    // 6. Vận hạn
     if (h) {
       const v = [];
       if (h.decadal) {
@@ -180,7 +182,7 @@
       }
       const ky = h.yearly.sihua.find(x => x.type === "化忌"), loc = h.yearly.sihua.find(x => x.type === "化禄");
       v.push(`Lưu niên: ${STAR[loc.star]} Hóa Lộc nhập ${PAL[loc.palace]} — ${HOA_TEXT["化禄"][loc.palace]}; ${STAR[ky.star]} Hóa Kỵ nhập ${PAL[ky.palace]} — ${HOA_TEXT["化忌"][ky.palace]}.`);
-      out.push(`<h4>5. Vận hạn</h4><ul>${v.map(x => `<li>${x}</li>`).join("")}</ul>`);
+      out.push(`<h4>6. Vận hạn</h4><ul>${v.map(x => `<li>${x}</li>`).join("")}</ul>`);
     }
 
     out.push(`<p class="disclaimer">Phần giải nghĩa được tổng hợp tự động theo quy tắc, chỉ nêu xu hướng chính. Tử Vi là hệ thống mệnh lý truyền thống, mang tính tham khảo; lá số không phải định mệnh, và không thay thế tư vấn y tế, pháp lý hay tài chính.</p>`);
